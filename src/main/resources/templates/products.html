@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Products</title>
+</head>
+
+<body>
+
+<h1>Amazon Seller</h1>
+
+<h2>My Products</h2>
+
+<table border="1">
+
+    <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Category</th>
+    </tr>
+
+    <tr th:each="product : ${products}">
+
+        <td th:text="${product.productId}"></td>
+
+        <td th:text="${product.productName}"></td>
+
+        <td th:text="${product.description}"></td>
+
+        <td th:text="${product.price}"></td>
+
+        <td th:text="${product.stock}"></td>
+
+        <td th:text="${product.category}"></td>
+
+    </tr>
+
+</table>
+
+<br>
+
+<a href="/login">
+    <button>Back</button>
+</a>
+
+</body>
+</html>

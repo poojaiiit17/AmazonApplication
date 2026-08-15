@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <title>My Products</title>
+
+</head>
+
+<body>
+
+<h1>My Products</h1>
+
+<br>
+
+<a href="/seller-dashboard">Back to Dashboard</a>
+
+<br><br>
+
+<table border="1" cellpadding="10">
+
+    <thead>
+
+    <tr>
+        <th>Product ID</th>
+        <th>Product Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Category</th>
+    </tr>
+
+    </thead>
+
+    <tbody>
+
+    <tr th:each="product : ${products}">
+
+        <td th:text="${product.productId}"></td>
+
+        <td th:text="${product.productName}"></td>
+
+        <td th:text="${product.description}"></td>
+
+        <td th:text="${product.price}"></td>
+
+        <td th:text="${product.stock}"></td>
+
+        <td th:text="${product.category}"></td>
+
+    </tr>
+
+    </tbody>
+
+</table>
+
+</body>
+
+</html>

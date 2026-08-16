@@ -72,13 +72,18 @@ public class CartDAO {
 
     public List<Product> getCartProducts(int customerId) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.* FROM products p " +
+
+        String sql = "SELECT p.*, ci.quantity AS cart_quantity " +
+                "FROM products p " +
                 "JOIN cart_items ci ON p.product_id = ci.product_id " +
                 "JOIN cart c ON ci.cart_id = c.cart_id " +
                 "WHERE c.customer_id = ?";
 
-        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, customerId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Product p = new Product();
@@ -89,6 +94,7 @@ public class CartDAO {
                     p.setPrice(rs.getDouble("price"));
                     p.setStock(rs.getInt("stock"));
                     p.setCategory(rs.getString("category"));
+                    p.setCartQuantity(rs.getInt("cart_quantity"));
                     products.add(p);
                 }
             }
@@ -98,14 +104,14 @@ public class CartDAO {
         return products;
     }
 
-    // Kept for compatibility with the earlier service code.
     public int createCart(int customerId) {
         return getOrCreateCart(customerId);
     }
 
-    public boolean addToCart(com.amazon.model.CartItem item) {
+    public boolean addToCart(CartItem item) {
         String sql = "INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)";
-        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, item.getCartId());
             ps.setInt(2, item.getProductId());
             ps.setInt(3, item.getQuantity());

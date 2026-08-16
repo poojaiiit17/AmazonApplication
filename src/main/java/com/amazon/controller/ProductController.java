@@ -16,21 +16,13 @@ public class ProductController {
 
     private ProductService productService = new ProductService();
 
-    // Open Add Product page
     @GetMapping("/add-product")
     public String addProductPage(HttpSession session) {
-
-        Integer sellerId =
-                (Integer) session.getAttribute("sellerId");
-
-        if (sellerId == null) {
-            return "redirect:/login";
-        }
-
+        Integer sellerId = (Integer) session.getAttribute("sellerId");
+        if (sellerId == null) return "redirect:/login";
         return "add-product";
     }
 
-    // Handle Add Product form
     @PostMapping("/add-product")
     public String addProduct(
             @RequestParam("productName") String productName,
@@ -41,15 +33,10 @@ public class ProductController {
             HttpSession session,
             Model model) {
 
-        Integer sellerId =
-                (Integer) session.getAttribute("sellerId");
-
-        if (sellerId == null) {
-            return "redirect:/login";
-        }
+        Integer sellerId = (Integer) session.getAttribute("sellerId");
+        if (sellerId == null) return "redirect:/login";
 
         Product product = new Product();
-
         product.setSellerId(sellerId);
         product.setProductName(productName);
         product.setDescription(description);
@@ -58,40 +45,24 @@ public class ProductController {
         product.setCategory(category);
 
         boolean result = productService.addProduct(product);
-
-        if (result) {
-            model.addAttribute(
-                    "message",
-                    "Product added successfully!"
-            );
-        } else {
-            model.addAttribute(
-                    "message",
-                    "Failed to add product."
-            );
-        }
-
+        model.addAttribute("message", result ? "Product added successfully!" : "Failed to add product.");
         return "add-product";
     }
 
-    // View only logged-in seller's products
     @GetMapping("/my-products")
-    public String myProducts(
-            HttpSession session,
-            Model model) {
-
-        Integer sellerId =
-                (Integer) session.getAttribute("sellerId");
-
-        if (sellerId == null) {
-            return "redirect:/login";
-        }
-
-        List<Product> products =
-                productService.getProductsBySeller(sellerId);
-
+    public String myProducts(HttpSession session, Model model) {
+        Integer sellerId = (Integer) session.getAttribute("sellerId");
+        if (sellerId == null) return "redirect:/login";
+        List<Product> products = productService.getProductsBySeller(sellerId);
         model.addAttribute("products", products);
-
         return "my-products";
+    }
+
+    @GetMapping("/products")
+    public String products(HttpSession session, Model model) {
+        Integer customerId = (Integer) session.getAttribute("customerId");
+        if (customerId == null) return "redirect:/customer-login";
+        model.addAttribute("products", productService.getAllProducts());
+        return "products";
     }
 }

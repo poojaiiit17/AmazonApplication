@@ -11,7 +11,10 @@ public class CustomerService {
     }
 
     public boolean login(String email, String password) {
-
         return customerDAO.login(email, password);
+    }
+
+    public int getCustomerId(String email, String password) {
+        return customerDAO.getCustomerId(email, password);
     }
 }

@@ -104,21 +104,27 @@ public class CartDAO {
         return products;
     }
 
+    public boolean clearCart(int customerId) {
+        String sql = "DELETE ci FROM cart_items ci " +
+                "JOIN cart c ON ci.cart_id = c.cart_id " +
+                "WHERE c.customer_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public int createCart(int customerId) {
         return getOrCreateCart(customerId);
     }
 
     public boolean addToCart(CartItem item) {
-        String sql = "INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)";
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, item.getCartId());
-            ps.setInt(2, item.getProductId());
-            ps.setInt(3, item.getQuantity());
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return addToCart(item.getCartId(), item.getProductId(), item.getQuantity());
     }
 }

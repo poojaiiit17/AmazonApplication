@@ -29,4 +29,8 @@ public class CartService {
     public List<Product> getCartProducts(int customerId) {
         return cartDAO.getCartProducts(customerId);
     }
+
+    public boolean clearCart(int customerId) {
+        return cartDAO.clearCart(customerId);
+    }
 }

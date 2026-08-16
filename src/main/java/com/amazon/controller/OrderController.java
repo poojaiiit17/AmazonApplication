@@ -1,7 +1,6 @@
 package com.amazon.controller;
 
 import com.amazon.model.Order;
-import com.amazon.model.OrderItem;
 import com.amazon.model.Payment;
 import com.amazon.model.Product;
 import com.amazon.service.CartService;
@@ -79,5 +78,14 @@ public class OrderController {
         model.addAttribute("orderId", orderId);
         model.addAttribute("total", total);
         return "order-success";
+    }
+
+    @GetMapping("/orders")
+    public String orderHistory(HttpSession session, Model model) {
+        Integer customerId = (Integer) session.getAttribute("customerId");
+        if (customerId == null) return "redirect:/customer-login";
+
+        model.addAttribute("orders", orderService.getOrdersByCustomer(customerId));
+        return "orders";
     }
 }

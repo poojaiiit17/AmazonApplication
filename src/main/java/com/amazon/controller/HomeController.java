@@ -31,20 +31,12 @@ public class HomeController {
 
         if (result) {
 
-            // Get the ID of the logged-in seller
             int sellerId = sellerService.getSellerId(email, password);
-
-            // Store seller ID in session
             session.setAttribute("sellerId", sellerId);
 
             System.out.println("Seller ID: " + sellerId);
 
-            model.addAttribute(
-                    "message",
-                    "Seller Login Successful!"
-            );
-
-            return "seller-dashboard";
+            return "redirect:/seller-dashboard";
 
         } else {
 
@@ -55,5 +47,17 @@ public class HomeController {
 
             return "login";
         }
+    }
+
+    @GetMapping("/seller-dashboard")
+    public String sellerDashboard(HttpSession session) {
+
+        Integer sellerId = (Integer) session.getAttribute("sellerId");
+
+        if (sellerId == null) {
+            return "redirect:/login";
+        }
+
+        return "seller-dashboard";
     }
 }

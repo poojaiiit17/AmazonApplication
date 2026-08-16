@@ -1,49 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Products</title>
+    <title>Amazon Products</title>
 </head>
-
 <body>
+<h1>Amazon Products</h1>
 
-<h1>Amazon Seller</h1>
+<p><a href="/customer-dashboard">Back to Dashboard</a> | <a href="/cart">View Cart</a></p>
 
-<h2>My Products</h2>
+<div th:if="${products.isEmpty()}">
+    <p>No products available.</p>
+</div>
 
-<table border="1">
-
+<table border="1" cellpadding="8" th:if="${!products.isEmpty()}">
     <tr>
-        <th>Product ID</th>
-        <th>Product Name</th>
+        <th>Product</th>
         <th>Description</th>
         <th>Price</th>
         <th>Stock</th>
         <th>Category</th>
+        <th>Action</th>
     </tr>
-
     <tr th:each="product : ${products}">
-
-        <td th:text="${product.productId}"></td>
-
         <td th:text="${product.productName}"></td>
-
         <td th:text="${product.description}"></td>
-
         <td th:text="${product.price}"></td>
-
         <td th:text="${product.stock}"></td>
-
         <td th:text="${product.category}"></td>
-
+        <td>
+            <form action="/cart/add" method="post">
+                <input type="hidden" name="productId" th:value="${product.productId}">
+                <input type="number" name="quantity" value="1" min="1" th:max="${product.stock}">
+                <button type="submit">Add to Cart</button>
+            </form>
+        </td>
     </tr>
-
 </table>
-
-<br>
-
-<a href="/login">
-    <button>Back</button>
-</a>
-
 </body>
 </html>

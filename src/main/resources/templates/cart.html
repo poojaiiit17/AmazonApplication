@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Cart</title>
+</head>
+<body>
+<h1>My Shopping Cart</h1>
+
+<p th:if="${message}" th:text="${message}"></p>
+
+<div th:if="${products.isEmpty()}">
+    <p>Your cart is empty.</p>
+</div>
+
+<table border="1" cellpadding="8" th:if="${!products.isEmpty()}">
+    <tr>
+        <th>Product</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Item Total</th>
+        <th>Category</th>
+    </tr>
+    <tr th:each="product : ${products}">
+        <td th:text="${product.productName}"></td>
+        <td th:text="${product.description}"></td>
+        <td th:text="${product.price}"></td>
+        <td th:text="${product.cartQuantity}"></td>
+        <td th:text="${product.cartTotal}"></td>
+        <td th:text="${product.category}"></td>
+    </tr>
+</table>
+
+<h2 th:if="${!products.isEmpty()}">
+    Total: ₹<span th:text="${#aggregates.sum(products.![cartTotal])}"></span>
+</h2>
+
+<a th:if="${!products.isEmpty()}" href="/checkout"><button>Checkout</button></a>
+<br><br>
+<a href="/products">Continue Shopping</a> |
+<a href="/orders">Order History</a> |
+<a href="/customer-dashboard">Back to Dashboard</a>
+</body>
+</html>

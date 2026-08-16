@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Checkout</title>
+</head>
+<body>
+<h1>Amazon Checkout</h1>
+
+<p th:if="${message}" th:text="${message}"></p>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Item Total</th>
+    </tr>
+    <tr th:each="product : ${products}">
+        <td th:text="${product.productName}"></td>
+        <td th:text="${product.price}"></td>
+        <td th:text="${product.cartQuantity}"></td>
+        <td th:text="${product.cartTotal}"></td>
+    </tr>
+</table>
+
+<h2>Total: ₹<span th:text="${total}"></span></h2>
+
+<form action="/checkout" method="post">
+    <label>Payment Method:</label>
+    <select name="paymentMethod" required>
+        <option value="COD">Cash on Delivery</option>
+        <option value="CARD">Dummy Card Payment</option>
+        <option value="UPI">Dummy UPI Payment</option>
+    </select>
+    <br><br>
+    <button type="submit">Place Order</button>
+</form>
+
+<br>
+<a href="/cart">Back to Cart</a>
+</body>
+</html>

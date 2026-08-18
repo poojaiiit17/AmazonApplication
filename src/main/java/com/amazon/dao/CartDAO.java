@@ -6,7 +6,9 @@ import com.amazon.util.DBConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CartDAO {
 
@@ -73,34 +75,59 @@ public class CartDAO {
     public List<Product> getCartProducts(int customerId) {
         List<Product> products = new ArrayList<>();
 
-        String sql = "SELECT p.*, ci.quantity AS cart_quantity " +
-                "FROM products p " +
-                "JOIN cart_items ci ON p.product_id = ci.product_id " +
-                "JOIN cart c ON ci.cart_id = c.cart_id " +
-                "WHERE c.customer_id = ?";
+        // Step 1: Find the cart of this customer.
+        int cartId = getOrCreateCart(customerId);
+        if (cartId == -1) return products;
+
+        // Step 2: Get product IDs and quantities from cart_items.
+        String cartItemsSql = "SELECT product_id, quantity FROM cart_items WHERE cart_id = ?";
+
+        // Keep quantity separately because product details are stored in products table.
+        Map<Integer, Integer> quantities = new HashMap<>();
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(cartItemsSql)) {
 
-            ps.setInt(1, customerId);
+            ps.setInt(1, cartId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Product p = new Product();
-                    p.setProductId(rs.getInt("product_id"));
-                    p.setSellerId(rs.getInt("seller_id"));
-                    p.setProductName(rs.getString("product_name"));
-                    p.setDescription(rs.getString("description"));
-                    p.setPrice(rs.getDouble("price"));
-                    p.setStock(rs.getInt("stock"));
-                    p.setCategory(rs.getString("category"));
-                    p.setCartQuantity(rs.getInt("cart_quantity"));
-                    products.add(p);
+                    quantities.put(rs.getInt("product_id"), rs.getInt("quantity"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return products;
+        }
+
+        // Step 3: Fetch each product separately. No JOIN is used.
+        String productSql = "SELECT * FROM products WHERE product_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(productSql)) {
+
+            for (Map.Entry<Integer, Integer> entry : quantities.entrySet()) {
+                ps.setInt(1, entry.getKey());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        Product p = new Product();
+                        p.setProductId(rs.getInt("product_id"));
+                        p.setSellerId(rs.getInt("seller_id"));
+                        p.setProductName(rs.getString("product_name"));
+                        p.setDescription(rs.getString("description"));
+                        p.setPrice(rs.getDouble("price"));
+                        p.setStock(rs.getInt("stock"));
+                        p.setCategory(rs.getString("category"));
+                        p.setCartQuantity(entry.getValue());
+                        products.add(p);
+                    }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return products;
     }
 
